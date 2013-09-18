@@ -13,7 +13,7 @@
   [{:title "Announcing Sauerbraten Day of Sobriety, a New Tournament"
     :link nil
     :author "mefisto"
-    :date "September 12, 2013"
+    :date "September 17, 2013"
     :content (md-to-html-string
               "
 Feeling down because there's no Sauerbraten tournament for you to play
