@@ -68,7 +68,8 @@ Yes! If you want to help out, you can:
 
 ### Did I hear that there might be cash prizes???
 
-Yes. There might be... stay tuned for a final answer.")}])
+As a matter of fact, we are currently discussing the possibility of offering
+cash prizes for winners. Stay tuned!")}])
 
 
 (defn home-page
