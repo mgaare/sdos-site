@@ -50,7 +50,9 @@ want everyone to have a good time and see Sauerbraten succeed.
 
 ### Why should we trust you guys, huh, huh?
 
-We are in favor of all that is good, and opposed to all that is bad.
+We want to address your concerns. Please ask echo-echo any questions and he
+will be able to make you feel better. Also, he is an engineer, he knows about
+electric circuits, and you have delicate body parts. Just saying.
 
 ### When is this damn thing gonna be?
 
