@@ -8,6 +8,8 @@
               :dependencies [[org.clojars.jcrossley3/tools.namespace "0.2.4.1"]
                              [org.immutant/immutant "1.0.1"]]}}
   :dependencies [[org.clojure/clojure "1.5.1"]
+                 [clj-time "0.6.0"]
+                 [clj-rss "0.1.3"]
                  [compojure "1.1.5"]
                  [enlive "1.1.4"]
                  [markdown-clj "0.9.31"]]

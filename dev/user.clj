@@ -4,4 +4,5 @@
             [clojure.set :as set]
             [clojure.pprint :refer (pprint)]
             [clojure.test :as test]
+            [sdos-site.core :as core]
             [clojure.tools.namespace.repl :refer (refresh refresh-all)]))

@@ -1,17 +1,25 @@
 (ns sdos-site.layout
     (:require [net.cgrand.enlive-html :as html]
               [net.cgrand.reload :refer (auto-reload)]
+              [clj-time.format :refer (unparse formatter)]
               [clojure.string :as str]))
 
 (auto-reload *ns*)
 
+(def base-url
+  "http://dos.sauerworld.org")
+
+(def verbose-date-format
+  (formatter "MMMM dd, yyyy"))
+
 (defn article-author
   [author date]
-  (cond
-   (and author date) (str "By " author " on " date ".")
-   author (str "By " author ".")
-   date (str "Posted " date ".")
-   :else nil))
+  (let [date (some->> date (unparse verbose-date-format))]
+    (cond
+     (and author date) (str "By " author " on " date ".")
+     author (str "By " author ".")
+     date (str "Posted " date ".")
+     :else nil)))
 
 (html/defsnippet main-menu "templates/snippets.html"
   [:.main-menu :> html/any-node]
@@ -42,11 +50,12 @@
 
 (html/defsnippet article "templates/snippets.html"
   [:article]
-  [{:keys [title link author date content]}]
+  [{:keys [id title author date content]}]
 
-  [:h3] (if link
-          (html/content (html/html [:a {:href link} title]))
-          (html/content title))
+  [:h3 :a] (let [link (str base-url "/article/" id)]
+             (html/do->
+              (html/set-attr :href link)
+              (html/content title)))
 
   [:h6] (html/content (article-author author date))
 

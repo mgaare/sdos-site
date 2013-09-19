@@ -1,6 +1,10 @@
 (ns sdos-site.core
   (:require [compojure.core :refer :all]
             [compojure.route :refer (not-found) :as route]
+            [clj-time.core :refer (date-time)]
+            [clj-time.format :as tf]
+            [clj-time.coerce :refer (to-date)]
+            [clj-rss.core :as rss]
             [immutant.web :refer (wrap-resource) :as web]
             [compojure.handler :refer (site)]
             [sdos-site.layout :refer (main-template)]
@@ -9,11 +13,14 @@
 (def links
   [])
 
+(def base-url
+  "http://dos.sauerworld.org")
+
 (def home-articles
-  [{:title "Announcing Sauerbraten Day of Sobriety, a New Tournament"
-    :link nil
+  [{:id 10
+    :title "Announcing Sauerbraten Day of Sobriety, a New Tournament"
     :author "mefisto"
-    :date "September 17, 2013"
+    :date (date-time 2013 9 17 20 30)
     :content (md-to-html-string
               "
 Feeling down because there's no Sauerbraten tournament for you to play
@@ -30,9 +37,9 @@ a day of very serious Sauerbraten competition. Prepare for... a
 
 We are still putting together all the plans and schemes and empty liquor
 bottles (well, they're still full for now)... but for now we want to know
-who is interested in playing. If you could please **sign up with your
-email address in that form over to the left** we will be able to keep in
-touch with updates!
+who is interested in playing. If you could please
+**sign up with your email address in that form over to the left**
+we will be able to keep in touch with updates!
 
 ### So just who are you people?
 
@@ -73,17 +80,53 @@ Yes! If you want to help out, you can:
 As a matter of fact, we are currently discussing the possibility of offering
 cash prizes for winners. Stay tuned!")}])
 
+(def layout-settings
+  {:email-title "Interested?"
+   :email-subtitle "Sign up for email updates!"})
 
 (defn home-page
   [req]
   (let [content-params
-        {:email-title "Interested?"
-         :email-subtitle "Sign up for email updates!"
-         :articles home-articles}]
+        (merge layout-settings
+               {:articles home-articles})]
     (main-template content-params)))
+
+(defn rss-item
+  [{:keys [id title author date content]}]
+  (let [link (str base-url "/article/" id)]
+    {:guid link
+     :title title
+     :description content
+     :link link
+     :pubDate (to-date date)}))
+
+(defn home-rss
+  [req]
+  (apply rss/channel-xml
+         {:title "Sauerbraten Day of Sobriety"
+          :link base-url
+          :description "A Sauerbraten Tournament"}
+         (map rss-item home-articles)))
+
+(defn get-article
+  [req]
+  (let [id (some->
+            (get-in req [:route-params :id])
+            (Integer/parseInt))]
+    (if-let [article
+             (->> home-articles
+                  (filter #(= id (:id %)))
+                  (first))]
+      (let [content-params
+            (merge layout-settings
+                   {:articles [article]})]
+        (main-template content-params))
+      {:status 404 :headers {} :body "Sorry, article not found."})))
 
 (defroutes app-routes
   (GET "/" [] home-page)
+  (GET "/article/:id" [] get-article)
+  (GET "/rss" [] home-rss)
   (not-found "Sorry buddy, page not found!"))
 
 (def app (wrap-resource (site app-routes) "public"))
