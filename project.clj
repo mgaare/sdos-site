@@ -12,6 +12,9 @@
                  [clj-rss "0.1.3"]
                  [compojure "1.1.5"]
                  [enlive "1.1.4"]
-                 [markdown-clj "0.9.31"]]
+                 [markdown-clj "0.9.31"]
+                 [korma "0.3.0-RC5"]
+                 [org.clojure/java.jdbc "0.3.0-alpha5"]
+                 [com.h2database/h2 "1.3.170"]]
   :immutant {:init "sdos-site.core/start"
              :context-path "/"})
