@@ -1,5 +1,6 @@
 @import "_variables";
 @import "foundation/scss/foundation";
+@import url(http://fonts.googleapis.com/css?family=Vollkorn:400,400italic,700,700italic&subset=latin);
 
 img.logo {
   height: 350px;
@@ -11,4 +12,9 @@ img.logo {
 h3.logo {
   margin-top: .2em;
   text-align: center;
+}
+
+ul {
+  list-style: square;
+  padding-left: 1.2em;
 }
