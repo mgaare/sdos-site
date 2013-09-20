@@ -30,7 +30,7 @@
 (defn find-all-articles
   [db]
   (-> (base-query db)
-      (k/select)))
+      (k/select (k/order :id :DESC))))
 
 (defn find-article
   [db id]
