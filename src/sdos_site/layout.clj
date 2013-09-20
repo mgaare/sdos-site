@@ -2,7 +2,9 @@
     (:require [net.cgrand.enlive-html :as html]
               [net.cgrand.reload :refer (auto-reload)]
               [clj-time.format :refer (unparse formatter)]
-              [clojure.string :as str]))
+              [clj-time.coerce :refer (from-date)]
+              [clojure.string :as str]
+              [markdown.core :refer (md-to-html-string)]))
 
 (auto-reload *ns*)
 
@@ -14,7 +16,9 @@
 
 (defn article-author
   [author date]
-  (let [date (some->> date (unparse verbose-date-format))]
+  (let [date (some->> date
+                      from-date
+                      (unparse verbose-date-format))]
     (cond
      (and author date) (str "By " author " on " date ".")
      author (str "By " author ".")
@@ -59,7 +63,7 @@
 
   [:h6] (html/content (article-author author date))
 
-  [:div.content] (html/html-content content))
+  [:div.content] (html/html-content (md-to-html-string content)))
 
 (html/deftemplate main-template "templates/layout.html"
   [{:keys [articles] :as content}]

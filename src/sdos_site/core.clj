@@ -1,5 +1,6 @@
 (ns sdos-site.core
-  (:require [compojure.core :refer :all]
+  (:require [sdos-site.article :refer :all]
+            [compojure.core :refer :all]
             [compojure.route :refer (not-found) :as route]
             [clj-time.core :refer (date-time)]
             [clj-time.format :as tf]
@@ -7,8 +8,9 @@
             [clj-rss.core :as rss]
             [immutant.web :refer (wrap-resource) :as web]
             [compojure.handler :refer (site)]
-            [sdos-site.layout :refer (main-template)]
-            [markdown.core :refer (md-to-html-string)]))
+            [sdos-site.layout :refer (main-template)]))
+
+(def world (atom {}))
 
 (def links
   [])
@@ -21,8 +23,7 @@
     :title "Announcing Sauerbraten Day of Sobriety, a New Tournament"
     :author "mefisto"
     :date (date-time 2013 9 17 20 30)
-    :content (md-to-html-string
-              "
+    :content "
 Feeling down because there's no Sauerbraten tournament for you to play
 in? Singing the blues because a certain other event that shared the same
 initials as our tournament put a stop to Sauerbraten tournament fun?
@@ -78,7 +79,7 @@ Yes! If you want to help out, you can:
 ### Did I hear that there might be cash prizes???
 
 As a matter of fact, we are currently discussing the possibility of offering
-cash prizes for winners. Stay tuned!")}])
+cash prizes for winners. Stay tuned!"}])
 
 (def layout-settings
   {:email-title "Interested?"
@@ -90,6 +91,15 @@ cash prizes for winners. Stay tuned!")}])
         (merge layout-settings
                {:articles home-articles})]
     (main-template content-params)))
+
+(defn page
+  [category]
+  (fn [req]
+    (let [db (:db req)
+          content-params
+          (merge layout-settings
+                 {:articles (find-category-articles db category)})]
+      (main-template content-params))))
 
 (defn rss-item
   [{:keys [id title author date content]}]
@@ -108,15 +118,13 @@ cash prizes for winners. Stay tuned!")}])
           :description "A Sauerbraten Tournament"}
          (map rss-item home-articles)))
 
-(defn get-article
+(defn show-article
   [req]
   (let [id (some->
             (get-in req [:route-params :id])
-            (Integer/parseInt))]
-    (if-let [article
-             (->> home-articles
-                  (filter #(= id (:id %)))
-                  (first))]
+            (Integer/parseInt))
+        db (:db req)]
+    (if-let [article (find-article db id)]
       (let [content-params
             (merge layout-settings
                    {:articles [article]})]
@@ -124,11 +132,34 @@ cash prizes for winners. Stay tuned!")}])
       {:status 404 :headers {} :body "Sorry, article not found."})))
 
 (defroutes app-routes
-  (GET "/" [] home-page)
-  (GET "/article/:id" [] get-article)
+  (GET "/" [] (page "home"))
+  (GET "/article/:id" [] show-article)
   (GET "/rss" [] home-rss)
   (not-found "Sorry buddy, page not found!"))
 
-(def app (wrap-resource (site app-routes) "public"))
+(defn wrap-db
+  [handler db-con]
+  (fn [req]
+    (-> req
+        (assoc :db db-con)
+        handler)))
 
-(defn start [] (web/start app))
+(defn wrap-db-missing
+  [handler]
+  (fn [req]
+    (if (:db req)
+      (handler req)
+      {:status 500
+       :headers {}
+       :body "Unrecoverable Database error. Specifically, the database is missing."})))
+
+(def app (-> app-routes
+             site
+             wrap-db-missing
+             (wrap-resource "public")))
+
+(defn start []
+  (let [db (create-db "resources/db/articles")]
+    (do
+      (web/start (wrap-db app db))
+      (swap! world assoc :db db))))
