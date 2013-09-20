@@ -110,13 +110,15 @@ cash prizes for winners. Stay tuned!"}])
      :link link
      :pubDate (to-date date)}))
 
-(defn home-rss
+(defn rss
   [req]
+  (let [db (:db req)
+        articles (art/find-all-articles db)])
   (apply rss/channel-xml
          {:title "Sauerbraten Day of Sobriety"
           :link base-url
           :description "A Sauerbraten Tournament"}
-         (map rss-item home-articles)))
+         (map rss-item articles)))
 
 (defn show-article
   [req]
@@ -134,7 +136,7 @@ cash prizes for winners. Stay tuned!"}])
 (defroutes app-routes
   (GET "/" [] (page "home"))
   (GET "/article/:id" [] show-article)
-  (GET "/rss" [] home-rss)
+  (GET "/rss" [] rss)
   (not-found "Sorry buddy, page not found!"))
 
 (defn wrap-db

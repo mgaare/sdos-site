@@ -27,6 +27,11 @@
   (-> (k/create-entity "articles")
       (k/database db)))
 
+(defn find-all-articles
+  [db]
+  (-> (base-query db)
+      (k/select)))
+
 (defn find-article
   [db id]
   (-> (base-query db)
@@ -36,4 +41,5 @@
 (defn find-category-articles
   [db cat]
   (-> (base-query db)
-      (k/select (k/where {:category cat}))))
+      (k/select (k/where {:category cat})
+                (k/order :id :DESC))))
