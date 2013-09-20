@@ -4690,3 +4690,10 @@ h3.logo {
 ul {
   list-style: square;
   padding-left: 1.2em; }
+
+div.content h1 {
+  font-size: 2.3125em; }
+div.content h2 {
+  font-size: 1.6875em; }
+div.content h3 {
+  font-size: 1.4375em; }

@@ -56,7 +56,7 @@
   [:article]
   [{:keys [id title author date content]}]
 
-  [:h3 :a] (let [link (str base-url "/article/" id)]
+  [:h2 :a] (let [link (str base-url "/article/" id)]
              (html/do->
               (html/set-attr :href link)
               (html/content title)))
