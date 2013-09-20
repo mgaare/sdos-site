@@ -113,12 +113,12 @@ cash prizes for winners. Stay tuned!"}])
 (defn rss
   [req]
   (let [db (:db req)
-        articles (art/find-all-articles db)])
-  (apply rss/channel-xml
-         {:title "Sauerbraten Day of Sobriety"
-          :link base-url
-          :description "A Sauerbraten Tournament"}
-         (map rss-item articles)))
+        articles (find-all-articles db)]
+    (apply rss/channel-xml
+           {:title "Sauerbraten Day of Sobriety"
+            :link base-url
+            :description "A Sauerbraten Tournament"}
+           (map rss-item articles))))
 
 (defn show-article
   [req]
