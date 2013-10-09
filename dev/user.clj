@@ -8,7 +8,16 @@
             [clj-time.format :as tf]
             [clj-time.coerce :as tc]
             [korma.core :as k]
-            [korma.db :as db]
+            [korma.db :as kdb]
             [sdos-site.core :as core]
-            [sdos-site.article :as art]
-            [clojure.tools.namespace.repl :refer (refresh refresh-all)]))
+            [sdos-site.db :as db]
+            [sdos-site.layout :as layout]
+            [clojure.tools.namespace.repl :refer (refresh refresh-all)]
+            [net.cgrand.enlive-html :as html]))
+
+(def db-path
+  "resources/db/main")
+
+(defn test-snippet
+  [snippet & args]
+  (html/emit* (apply snippet args)))

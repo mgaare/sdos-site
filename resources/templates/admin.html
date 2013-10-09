@@ -1,0 +1,54 @@
+<div id="admin-articles-summary">
+
+  <table>
+    <thead>
+      <tr>
+        <th>id</th>
+        <th>Date</th>
+        <th>Title</th>
+        <th>Author</th>
+        <th>Category</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td>January 1, 2013</td>
+        <td>Hello, World</td>
+        <td>mefisto</td>
+        <td>home</td>
+      </tr>
+    </tbody>
+  </table>
+
+</div>
+
+<div id="article-page">
+
+  <form method="POST" action="edit">
+
+    <label for="title">Title:</label>
+    <input type="text" name="title" id="title" />
+
+    <label for="author">Author:</label>
+    <input type="text" name="author" id="author" />
+
+    <label for="category">Category:</label>
+    <input type="text" name="category" id="category" />
+
+    <label for="content">Content:</label>
+    <textarea name="content" id="content" cols="100" rows="50" />
+
+    <input type="submit" value="Submit" />
+
+  </form>
+
+</div>
+
+<div id="delete-button">
+
+  <form method="POST" action="delete">
+    <input type="submit" value="Delete!" />
+  </form>
+
+</div>

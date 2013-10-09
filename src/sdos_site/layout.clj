@@ -14,11 +14,15 @@
 (def verbose-date-format
   (formatter "MMMM dd, yyyy"))
 
+(defn format-date
+  [date]
+  (some->> date
+           from-date
+           (unparse verbose-date-format)))
+
 (defn article-author
   [author date]
-  (let [date (some->> date
-                      from-date
-                      (unparse verbose-date-format))]
+  (let [date (format-date date)]
     (cond
      (and author date) (str "By " author " on " date ".")
      author (str "By " author ".")
@@ -75,3 +79,26 @@
   [:#content-main] (html/content (map article articles))
 
   [:.bottom-menu] (html/content (bottom-menu content)))
+
+(html/deftemplate error-template "templates/layout.html"
+  [{:keys [error] :as content}]
+
+  [:#side-menu] (html/content (main-menu content))
+
+  [:#content-main] (html/html-content content)
+
+  [:.bottom-menu] (html/content (bottom-menu content)))
+
+(defn wrap-error-template
+  [settings]
+  (fn [error]
+    (error-template (merge settings {:error error}))))
+
+(html/deftemplate app-page "templates/layout.html"
+  [settings content]
+
+  [:#side-menu] (html/content (main-menu content))
+
+  [:.bottom-menu] (html/content (bottom-menu content))
+
+  [:#content-main] (html/content content))
