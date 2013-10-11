@@ -103,4 +103,53 @@ if you aren't on our list yet, **sign up using the form over there on the left.*
 
 As you can imagine, it will take some manpower to run all these games, so we are
 looking for volunteers to help as refs during the games. Let us know if you're
-interested!"}]
+interested!"}
+ {:title "Sauerbraten Day of Sobriety I"
+  :author "mefisto"
+  :date (tc/to-date (date-time 2013 10 11 17 15))
+  :category "home"
+  :content "
+We are proud to announce the first tournament!
+
+##Day of Sobriety I##
+
+![Last drink...](/img/last-shot-regular.jpg)
+
+### When ###
+
+Sunday, October 20th.
+
+- 1:00 PM Eastern US Time
+- 5:00 PM UTC
+- 7:00 PM Germany Time
+
+### Modes ###
+
+- 1v1 Insta
+- 2v2 Teamplay FFA
+- 3v3 Efficiency CTF
+
+### What Next ###
+
+Registration for the tournament will be on the SDoS website, and it will be
+available soon! Just as soon as we finish writing the code for it! If you sign
+up for email updates using the form on the left, we will send out an email when
+registration is open.
+
+### Other Important Info ###
+
+We will be using a protected anti-cheat client, which will be available for
+download through this site before the tournament.
+
+Map selection for each game will be done using a veto system, from a
+pre-selected map pool. We will announce the map pool soon.
+
+### Contact ###
+
+For any questions or concerns, you can either:
+- Email mefisto. The address is his nick, at sauerworld dot org.
+- Come and see us on IRC. We're in #sdos channel on Gamesurge.
+
+"
+  }
+ ]
