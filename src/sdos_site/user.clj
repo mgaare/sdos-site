@@ -3,7 +3,8 @@
             [sdos-site.settings :refer :all]
             [sdos-site.layout :as layout]
             [sdos-site.views.user :as view]
-            [sdos-site.db :as db]))
+            [sdos-site.db :as db]
+            [clojure.tools.logging :refer (info )]))
 
 (defn wrap-validation
   [h error-view-fn & opts]
@@ -32,11 +33,18 @@
 
 (defn login-page
   [req]
-  "login page")
+  (layout/app-page (get-settings req) (view/login-page)))
 
 (defn do-login
   [req]
-  "do login")
+  (do
+    (println req)
+    (let [username (-> req :params :username)
+          password (-> req :params :password)]
+      (if-let [user (db/check-login (:db req) username password)]
+        (assoc-in redirect-home [:session :user] user)
+        (layout/app-page (get-settings req)
+                         (view/login-page "Invalid username or password."))))))
 
 (defn do-logout
   [req]

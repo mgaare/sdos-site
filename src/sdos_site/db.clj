@@ -10,9 +10,12 @@
 
 (defn create-db
   [resource-loc]
-  (db/create-db (db/h2 {:db resource-loc
+  (let [db-spec (db/h2 {:db resource-loc
                         :naming {:keys str/lower-case
-                                 :fields str/upper-case}})))
+                                 :fields str/upper-case}})]
+    (-> db-spec
+        db/create-db
+        (assoc :config db-spec))))
 
 (defn create-articles-table
   [db-spec]
@@ -35,7 +38,7 @@
      [:username "varchar"]
      [:password "varchar"]
      [:email "varchar"]
-     [:validation-key "varchar"]
+     [:validation_key "varchar"]
      [:validated "boolean"]
      [:pubkey "varchar"]
      [:created :timestamp]
@@ -104,20 +107,20 @@
       (k/database db)))
 
 (defn insert-user
-  [db {:keys [username password email]} & opts]
-  (let [opts-map (apply hash-map opts)
-        admin (or (:admin opts-map) false)
-        pubkey (or (:pubkey opts-map) nil)
-        validation-key (or (:validation-key opts-map) (random-uuid))
-        validated (or (:validated opts-map) false)
+  [db {:keys [username password email admin
+              pubkey validation-key validated created]}]
+  (let [admin (true? admin)
+        pubkey (or pubkey nil)
+        validation-key (or validation-key (random-uuid))
+        validated (or validated false)
         password (hash-password password)
-        created (or (:created opts-map) (to-date (now)))]
+        created (or created (to-date (now)))]
     (-> (base-users-query db)
         (k/insert
          (k/values {:username username
                     :password password
                     :email email
-                    :validation-key validation-key
+                    :validation_key validation-key
                     :validated validated
                     :pubkey pubkey
                     :created created
@@ -127,7 +130,7 @@
   [db validation-key]
   (let [base (base-users-query db)
         user (-> base
-                 (k/select (k/where {:validation-key validation-key}))
+                 (k/select (k/where {:validation_key validation-key}))
                  first)]
     (when user
       (do
@@ -139,7 +142,7 @@
 
 (defn check-login
   [db username password]
-  (let [user (-> (base-users-query db)
+  (when-let [user (-> (base-users-query db)
                  (k/select (k/where {:username username}))
                  first)]
     (when (check-password password (:password user))

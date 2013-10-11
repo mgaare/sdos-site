@@ -15,3 +15,12 @@
                           ["Registration Date" (layout/verbose-date-format created)]]]
                         [:dt] (html/content title)
                         [:dt] (html/content text)))
+
+(html/defsnippet login-page "templates/user.html"
+  [:div#user-login]
+  [& [error]]
+
+  [:form] (html/set-attr :action "/user/login")
+
+  [:p.error] (when error
+               (html/content error)))

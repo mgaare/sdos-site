@@ -19,10 +19,9 @@
   [category]
   (fn [req]
     (let [db (:db req)
-          content-params
-          (merge (get-settings req)
-                 {:articles (find-category-articles db category)})]
-      (main-template content-params))))
+          articles (find-category-articles db category)
+          settings (get-settings req)]
+      (main-template settings articles))))
 
 (defn rss-item
   [{:keys [id title author date content]}]
@@ -50,10 +49,8 @@
             (Integer/parseInt))
         db (:db req)]
     (if-let [article (find-article db id)]
-      (let [content-params
-            (merge (get-settings req)
-                   {:articles [article]})]
-        (main-template content-params))
+      (let [settings (get-settings req)]
+        (main-template settings article))
       {:status 404 :headers {} :body "Sorry, article not found."})))
 
 (defroutes admin-routes
@@ -99,6 +96,8 @@
   (GET "/events" [] (page "events"))
   (GET "/article/:id" [] show-article)
   (GET "/rss" [] rss)
+  (context "/admin" [] (admin/wrap-require-admin admin-routes))
+  (context "/user" [] user-routes)
   (not-found "Sorry buddy, page not found!"))
 
 (defn wrap-db

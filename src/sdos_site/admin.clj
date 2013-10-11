@@ -4,6 +4,13 @@
             [sdos-site.views.admin :as view]
             [sdos-site.layout :as layout]))
 
+(defn wrap-require-admin
+  [h]
+  (fn [req]
+    (if (true? (-> req :session :user :admin))
+      (h req)
+      redirect-home)))
+
 (defn show-articles-summary
   [req]
   (let [db (:db req)
@@ -18,7 +25,7 @@
 
 (defn do-create-article
   [req]
-  (let [form (:form-params req)
+  (let [form (:params req)
         article {:title (:title form)
                  :author (:author form)
                  :category (:category form)
@@ -31,14 +38,14 @@
 
 (defn edit-article-page
   [req]
-  (let [id (-> req :query-params :id)
+  (let [id (-> req :params :id)
         article (db/find-article (:db req) id)
-        content (view/article article)]
+        content (view/article article true)]
     (layout/app-page (get-settings req) content)))
 
 (defn do-edit-article
   [req]
-  (let [form (:form-params req)
+  (let [form (:params req)
         article {:id (:id form)
                  :date (:date form)
                  :title (:title form)

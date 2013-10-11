@@ -29,16 +29,30 @@
      date (str "Posted " date ".")
      :else nil)))
 
-(html/defsnippet main-menu "templates/snippets.html"
-  [:.main-menu :> html/any-node]
-  [{:keys [menu-items menu-title]}]
+(html/defsnippet menu "templates/snippets.html"
+  [:.links-menu :> html/any-node]
+  [items & [title]]
 
   [:ul [:li html/first-of-type]]
-  (html/clone-for [[text url] menu-items]
+  (html/clone-for [[text url] items]
                   [:li :a] (html/content text)
                   [:li :a] (html/set-attr :href url))
 
-  [:h5] (when menu-title (html/content menu-title)))
+  [:h5] (when title (html/content title)))
+
+(defn main-menu
+  [settings]
+  (menu (:menu-items settings) (:menu-title settings)))
+
+(defn user-menu
+  [settings]
+  (when (:logged-in settings)
+    (menu (:user-menu-items settings) (:user-menu-title settings))))
+
+(defn admin-menu
+  [settings]
+  (when (:admin settings)
+    (menu (:admin-menu-items settings) (:admin-menu-title settings))))
 
 (html/defsnippet bottom-menu "templates/snippets.html"
   [:div.bottom-menu :> html/any-node]
@@ -70,35 +84,47 @@
   [:div.content] (html/html-content (md-to-html-string content)))
 
 (html/deftemplate main-template "templates/layout.html"
-  [{:keys [articles] :as content}]
+  [settings articles]
 
-  [:#side-menu] (html/content (main-menu content))
+  [:#side-menu] (html/content (main-menu settings))
 
-  [:#email-signup] (html/content (email-signup content))
+  [:#user-menu] (html/content (user-menu settings))
+
+  [:#admin-menu] (html/content (admin-menu settings))
+
+  [:#email-signup] (html/content (email-signup settings))
 
   [:#content-main] (html/content (map article articles))
 
-  [:.bottom-menu] (html/content (bottom-menu content)))
+  [:.bottom-menu] (html/content (bottom-menu settings)))
 
 (html/deftemplate error-template "templates/layout.html"
-  [{:keys [error] :as content}]
+  [settings error]
 
-  [:#side-menu] (html/content (main-menu content))
+  [:#side-menu] (html/content (main-menu settings))
 
-  [:#content-main] (html/html-content content)
+  [:#user-menu] (html/content (user-menu settings))
 
-  [:.bottom-menu] (html/content (bottom-menu content)))
+  [:#admin-menu] (html/content (admin-menu settings))
+
+  [:#content-main] (html/html-content error)
+
+  [:.bottom-menu] (html/content (bottom-menu settings)))
 
 (defn wrap-error-template
   [settings]
   (fn [error]
-    (error-template (merge settings {:error error}))))
+    (error-template settings error)))
 
 (html/deftemplate app-page "templates/layout.html"
   [settings content]
 
-  [:#side-menu] (html/content (main-menu content))
+  [:#side-menu] (html/content (main-menu settings))
 
-  [:.bottom-menu] (html/content (bottom-menu content))
+  [:#user-menu] (html/content (user-menu settings))
+
+  [:#admin-menu] (html/content (admin-menu settings))
+
+  [:.bottom-menu] (html/content (bottom-menu settings))
 
   [:#content-main] (html/content content))

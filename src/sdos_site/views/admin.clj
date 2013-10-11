@@ -9,22 +9,22 @@
   [:tbody :tr]
   (html/clone-for [article articles]
 
-             [[:td (html/nth-of-type 0)]]
+             [[:td (html/nth-of-type 1)]]
              (html/content
               (html/html [:a
                           {:href (str "/admin/articles/" (:id article))}
                           (str (:id article))]))
 
-             [[:td (html/nth-of-type 1)]]
+             [[:td (html/nth-of-type 2)]]
              (html/content (layout/format-date (:date article)))
 
-             [[:td (html/nth-of-type 2)]]
+             [[:td (html/nth-of-type 3)]]
              (html/content (:title article))
 
-             [[:td (html/nth-of-type 3)]]
+             [[:td (html/nth-of-type 4)]]
              (html/content (:author article))
 
-             [[:td (html/nth-of-type 4)]]
+             [[:td (html/nth-of-type 5)]]
              (html/content (:category article))))
 
 (html/defsnippet delete-button "templates/admin.html"
@@ -54,7 +54,7 @@
                  identity)
 
   [:#content] (if (:content article)
-                (html/set-attr :value (:content article))
+                (html/content (:content article))
                 identity)
 
   [:form] (if (and edit? (:id article))
