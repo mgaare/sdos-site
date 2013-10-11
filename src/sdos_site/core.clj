@@ -50,7 +50,7 @@
         db (:db req)]
     (if-let [article (find-article db id)]
       (let [settings (get-settings req)]
-        (main-template settings article))
+        (main-template settings [article]))
       {:status 404 :headers {} :body "Sorry, article not found."})))
 
 (defroutes admin-routes
