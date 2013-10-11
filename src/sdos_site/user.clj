@@ -38,7 +38,6 @@
 (defn do-login
   [req]
   (do
-    (println req)
     (let [username (-> req :params :username)
           password (-> req :params :password)]
       (if-let [user (db/check-login (:db req) username password)]
