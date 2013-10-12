@@ -13,6 +13,8 @@
                  [org.clojure/tools.logging "0.2.6"]
                  [clj-time "0.6.0"]
                  [clj-rss "0.1.3"]
+                 [environ "0.4.0"]
+                 [com.draines/postal "1.11.0"]
                  [compojure "1.1.5"]
                  [enlive "1.1.4"]
                  [markdown-clj "0.9.31"]

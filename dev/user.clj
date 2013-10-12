@@ -9,6 +9,8 @@
             [clj-time.coerce :as tc]
             [compojure.handler :refer (site)]
             [compojure.response :refer (render)]
+            [postal.core :as mail]
+            [environ.core :refer (env)]
             [korma.core :as k]
             [korma.db :as kdb]
             [sdos-site.core :as core]
@@ -17,6 +19,9 @@
             [clojure.tools.namespace.repl :refer (refresh refresh-all)]
             [net.cgrand.enlive-html :as html]
             [ring.mock.request :as mr]))
+
+;; mailgun smtp with ssl is port 587 - like amazon apparently
+
 
 (def db-path
   "resources/db/main")

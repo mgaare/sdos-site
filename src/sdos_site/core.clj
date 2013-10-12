@@ -5,6 +5,7 @@
             [sdos-site.user :as user]
             [sdos-site.admin :as admin]
             [sdos-site.rss :refer (rss)]
+            [environ.core :refer (env)]
             [compojure.core :refer :all]
             [compojure.route :refer (not-found) :as route]
             [immutant.web :refer (wrap-resource) :as web]
@@ -76,6 +77,13 @@
        :headers {}
        :body "Unrecoverable Database error. Specifically, the database is missing."})))
 
+(defn wrap-smtp-server
+  [handler smtp-server]
+  (fn [req]
+    (-> req
+        (assoc :smtp-server smtp-server)
+        handler)))
+
 (def app (-> app-routes
              site
              wrap-db-missing
@@ -87,9 +95,24 @@
       (.close datasource))))
 
 (defn start []
-  (let [db (create-db "resources/db/main")]
+  (let [db (create-db "resources/db/main")
+        smtp-host (:mg-smtp-host env)
+        smtp-login (:mg-smtp-login env)
+        smtp-password (:mg-smtp-password env)
+        smtp-params {:host smtp-host
+                     :user smtp-login
+                     :pass smtp-password
+                     :tls true
+                     :port 587}
+        smtp-wrap-fn (if (and smtp-host smtp-login smtp-password)
+                       (fn [h]
+                         (wrap-smtp-server h smtp-params))
+                       identity)]
     (do
-      (web/start (wrap-db app db))
+      (-> app
+          (wrap-db db)
+          smtp-wrap-fn
+          web/start)
       (swap! world assoc :db db))))
 
 (defn initialize []
