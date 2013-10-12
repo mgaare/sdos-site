@@ -1,57 +1,17 @@
 (ns sdos-site.core
   (:require [sdos-site.settings :refer :all]
-            [sdos-site.db :refer :all]
+            [sdos-site.db :refer (create-db)]
+            [sdos-site.page :as page]
             [sdos-site.user :as user]
             [sdos-site.admin :as admin]
+            [sdos-site.rss :refer (rss)]
             [compojure.core :refer :all]
             [compojure.route :refer (not-found) :as route]
-            [clj-time.core :refer (date-time)]
-            [clj-time.format :as tf]
-            [clj-time.coerce :refer (to-date)]
-            [clj-rss.core :as rss]
             [immutant.web :refer (wrap-resource) :as web]
-            [compojure.handler :refer (site)]
-            [sdos-site.layout :refer (main-template)]))
+            [immutant.util :refer (at-exit)]
+            [compojure.handler :refer (site)]))
 
 (def world (atom {}))
-
-(defn page
-  [category]
-  (fn [req]
-    (let [db (:db req)
-          articles (find-category-articles db category)
-          settings (get-settings req)]
-      (main-template settings articles))))
-
-(defn rss-item
-  [{:keys [id title author date content]}]
-  (let [link (str base-url "/article/" id)]
-    {:guid link
-     :title title
-     :description content
-     :link link
-     :pubDate (to-date date)}))
-
-(defn rss
-  [req]
-  (let [db (:db req)
-        articles (find-category-articles db "home")]
-    (apply rss/channel-xml
-           {:title "Sauerbraten Day of Sobriety"
-            :link base-url
-            :description "A Sauerbraten Tournament"}
-           (map rss-item articles))))
-
-(defn show-article
-  [req]
-  (let [id (some->
-            (get-in req [:route-params :id])
-            (Integer/parseInt))
-        db (:db req)]
-    (if-let [article (find-article db id)]
-      (let [settings (get-settings req)]
-        (main-template settings [article]))
-      {:status 404 :headers {} :body "Sorry, article not found."})))
 
 (defroutes admin-routes
   (GET "/" [] admin/show-articles-summary)
@@ -91,10 +51,10 @@
   (POST "/signup/:id" [] user/do-edit-signup))
 
 (defroutes app-routes
-  (GET "/" [] (page "home"))
-  (GET "/about" [] (page "about"))
-  (GET "/events" [] (page "events"))
-  (GET "/article/:id" [] show-article)
+  (GET "/" [] (page/page "home"))
+  (GET "/about" [] (page/page "about"))
+  (GET "/events" [] (page/page "events"))
+  (GET "/article/:id" [] page/show-article)
   (GET "/rss" [] rss)
   (context "/admin" [] (admin/wrap-require-admin admin-routes))
   (context "/user" [] user-routes)
@@ -121,8 +81,17 @@
              wrap-db-missing
              (wrap-resource "public")))
 
+(defn stop []
+  (when-let [db (@world :db)]
+    (let [datasource (-> db :pool deref :datasource)]
+      (.close datasource))))
+
 (defn start []
   (let [db (create-db "resources/db/main")]
     (do
       (web/start (wrap-db app db))
       (swap! world assoc :db db))))
+
+(defn initialize []
+  (start)
+  (at-exit stop))

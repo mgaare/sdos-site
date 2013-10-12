@@ -1,6 +1,7 @@
 (ns sdos-site.admin
   (:require [sdos-site.settings :refer :all]
-            [sdos-site.db :as db]
+            [sdos-site.models.articles :as articles]
+            [sdos-site.models.users :as users]
             [sdos-site.views.admin :as view]
             [sdos-site.layout :as layout]))
 
@@ -14,7 +15,7 @@
 (defn show-articles-summary
   [req]
   (let [db (:db req)
-        articles (db/find-all-articles db)
+        articles (articles/find-all-articles db)
         content (view/articles-summary articles)]
     (layout/app-page (get-settings req) content)))
 
@@ -30,7 +31,7 @@
                  :author (:author form)
                  :category (:category form)
                  :content (:content form)}
-        save (db/insert-article (:db req) article)
+        save (articles/insert-article (:db req) article)
         content (if save
                   "Article inserted successfully."
                   "Article failed to insert properly.")]
@@ -39,7 +40,7 @@
 (defn edit-article-page
   [req]
   (let [id (-> req :params :id)
-        article (db/find-article (:db req) id)
+        article (articles/find-article (:db req) id)
         content (view/article article true)]
     (layout/app-page (get-settings req) content)))
 
@@ -52,7 +53,7 @@
                  :author (:author form)
                  :category (:category form)
                  :content (:content form)}
-        save (db/update-article (:db req) article)
+        save (articles/update-article (:db req) article)
         content (if save
                   "Article edited successfully."
                   "Article failed to edit properly.")]
