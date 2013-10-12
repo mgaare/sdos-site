@@ -1,10 +1,15 @@
 (ns immutant.init
+  (:require [immutant.util :refer (at-exit)]
+            [sdos-site.core :refer (stop)])
   ;(:use sdos-site.core)
-  
+
   ;(:require [immutant.messaging :as messaging]
   ;          [immutant.web :as web]
   ;          [immutant.util :as util])
   )
+
+
+(at-exit stop)
 
 ;; This file will be loaded when the application is deployed to Immutant, and
 ;; can be used to start services your app needs. Examples:
@@ -27,4 +32,3 @@
 
 ; (messaging/start "/queue/a-queue")
 ; (messaging/listen "/queue/a-queue" #(println "received: " %))
-

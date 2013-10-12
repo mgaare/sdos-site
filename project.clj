@@ -20,5 +20,5 @@
                  [org.clojure/java.jdbc "0.3.0-alpha5"]
                  [com.h2database/h2 "1.3.170"]
                  [clojurewerkz/scrypt "1.0.0"]]
-  :immutant {:init "sdos-site.core/start"
+  :immutant {:init "sdos-site.core/initialize"
              :context-path "/"})
