@@ -2,7 +2,8 @@
   (:require [clojurewerkz.scrypt.core :as sc]
             [korma.core :as k]
             [clj-time.coerce :refer (to-date)]
-            [clj-time.core :refer (now)])
+            [clj-time.core :refer (now)]
+            [validateur.validation :as v])
   (:import [java.util UUID]))
 
 (defn hash-password
@@ -56,11 +57,15 @@
              (k/where {:id (:id user)})))
         true))))
 
+(defn get-by-username
+  [db username]
+  (-> (base-users-query db)
+      (k/select (k/where {:username username}))
+      first))
+
 (defn check-login
   [db username password]
-  (when-let [user (-> (base-users-query db)
-                 (k/select (k/where {:username username}))
-                 first)]
+  (when-let [user (get-by-username db username)]
     (when (check-password password (:password user))
       user)))
 
@@ -71,3 +76,40 @@
         (k/update
          (k/set-fields {:pubkey pubkey})
          (k/where {:id id})))))
+
+(defn match-of
+  "Creates validation function that specifies that two attributes must be the
+   same (for example, for password & password confirmation fields."
+  [attribute1 attribute2]
+  (let [getter (fn [k] (fn [m] (if (vector? k)
+                                 (get-in m k)
+                                 (get m k))))
+        f1 (getter attribute1)
+        f2 (getter attribute2)]
+    (fn [m]
+      (let [[v1 v2] ((juxt f1 f2) m)
+            res (= v1 v2)
+            msg (str "must match " attribute2)
+            errors (if res {} {attribute1 #{msg}})]
+        [(empty? errors) errors]))))
+
+(defn uniqueness-of
+  "Validation function that checks that a value unique. Takes a key to retrieve
+   the value, and a function that, when passed the value, will report its
+   uniqueness. Like, for instance, a database query function."
+  [attribute check-fn]
+  (let [f (vector? attribute) get-in get]
+    (fn [m]
+      (let [value (f m)
+            unique? (check-fn value)
+            msg ("not available, already taken.")
+            errors (if res {} {attribute #{msg}})]
+        [(empty? errors) errors]))))
+
+(defn make-registration-validator
+  [db]
+  (v/validation-set
+   (v/presence-of :email)
+   (match-of :password :password-confirm)
+   (v/presence-of :username)
+   (v/uniqueness-of :username #(get-by-username db %))))
