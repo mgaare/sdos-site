@@ -170,11 +170,13 @@ To validate your email address, please click on:</p>
   (let [submitted-key (-> req :request-params :validation-key)
         db (:db req)]
     (if (users/validate-key db submitted-key)
-      (let [user (-> req :session :user)
+      (let [username (-> req :session :user :username)
             body (view/success-page (str "Email validated."))]
-        (if user
-          {:session {:user (assoc-in user :validated true)}
-           :body body}
+        (if username
+          (let [session (:session req)
+                updated-user (users/get-by-username db username)]
+            {:session (assoc-in [:session :user] updated-user)
+             :body body})
           body))
       (layout/error-template (get-settings req)
                              "Sorry, email validation key not found."))))
