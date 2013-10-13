@@ -77,6 +77,15 @@
          (k/set-fields {:pubkey pubkey})
          (k/where {:id id})))))
 
+(defn update-password
+  "Updates a user's password."
+  [db user new-password]
+  (when-let [id (:id user)]
+    (-> (base-users-query-db)
+        (k/update
+         (k/set-fields {:password (hash-password new-password)})
+         (k/where {:id id})))))
+
 (defn match-of
   "Creates validation function that specifies that two attributes must be the
    same (for example, for password & password confirmation fields."
@@ -98,18 +107,29 @@
    the value, and a function that, when passed the value, will report its
    uniqueness. Like, for instance, a database query function."
   [attribute check-fn]
-  (let [f (vector? attribute) get-in get]
+  (let [f (if (vector? attribute) get-in get)]
     (fn [m]
-      (let [value (f m)
+      (let [value (f m attribute)
             unique? (check-fn value)
-            msg ("not available, already taken.")
-            errors (if res {} {attribute #{msg}})]
+            msg (str value " not available, already taken.")
+            errors (if unique? {} {attribute #{msg}})]
         [(empty? errors) errors]))))
+
+(def password-match
+  (match-of :password :password-confirm))
 
 (defn make-registration-validator
   [db]
   (v/validation-set
    (v/presence-of :email)
-   (match-of :password :password-confirm)
+   (v/presence-of :password)
+   password-match
    (v/presence-of :username)
-   (v/uniqueness-of :username #(get-by-username db %))))
+   (uniqueness-of :username #(->> %
+                                 (get-by-username db)
+                                 nil?))))
+
+(def password-validator
+  (v/validation-set
+   (v/presence-of :password)
+   password-match))

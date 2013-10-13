@@ -2,7 +2,7 @@
   (:require [postal.core :refer (send-message)]
             [clojure.tools.logging :refer (error)]))
 
-(defn send
+(defn send-email
   "Sends an email message. Two required args -
    server - map in the format as required by postal
    message - map with :to :from :subject :body"
