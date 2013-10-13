@@ -62,6 +62,7 @@
   (not-found "Sorry buddy, page not found!"))
 
 (defn wrap-db
+  "Adds a db connection reference to the request map."
   [handler db-con]
   (fn [req]
     (-> req
@@ -69,6 +70,7 @@
         handler)))
 
 (defn wrap-db-missing
+  "Error handler for when the db connection reference is missing."
   [handler]
   (fn [req]
     (if (:db req)
@@ -78,6 +80,7 @@
        :body "Unrecoverable Database error. Specifically, the database is missing."})))
 
 (defn wrap-smtp-server
+  "Adds smtp server params into the request map."
   [handler smtp-server]
   (fn [req]
     (-> req

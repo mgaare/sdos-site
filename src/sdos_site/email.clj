@@ -3,6 +3,9 @@
             [clojure.tools.logging :refer (error)]))
 
 (defn send
+  "Sends an email message. Two required args -
+   server - map in the format as required by postal
+   message - map with :to :from :subject :body"
   [server message]
   (let [result (send-message server message)
         code (:code result)]
