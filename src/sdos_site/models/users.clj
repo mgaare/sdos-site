@@ -43,19 +43,20 @@
                     :created created
                     :admin admin})))))
 
-(defn validate-key
+(defn get-by-validation-key
   [db validation-key]
-  (let [base (base-users-query db)
-        user (-> base
-                 (k/select (k/where {:validation_key validation-key}))
-                 first)]
-    (when user
-      (do
-        (-> base
-            (k/update
-             (k/set-fields {:validated true})
-             (k/where {:id (:id user)})))
-        true))))
+  (let [base (base-users-query db)]
+    (-> base
+        (k/select (k/where {:validation_key validation-key}))
+        first)))
+
+(defn set-validated
+  [db user]
+  (when-let [id (:id user)]
+    (-> (base-users-query db)
+        (k/update
+         (k/set-fields {"VALIDATED" true})
+         (k/where {:id id})))))
 
 (defn get-by-username
   [db username]
@@ -74,14 +75,14 @@
   (when-let [id (:id user)]
     (-> (base-users-query db)
         (k/update
-         (k/set-fields {:pubkey pubkey})
+         (k/set-fields {"PUBKEY" pubkey})
          (k/where {:id id})))))
 
 (defn update-password
   "Updates a user's password."
   [db user new-password]
   (when-let [id (:id user)]
-    (-> (base-users-query-db)
+    (-> (base-users-query db)
         (k/update
          (k/set-fields {:password (hash-password new-password)})
          (k/where {:id id})))))

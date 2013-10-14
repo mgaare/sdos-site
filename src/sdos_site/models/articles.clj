@@ -1,7 +1,8 @@
 (ns sdos-site.models.articles
-  (require [korma.core :as k]
-           [clj-time.coerce :refer (to-date)]
-           [clj-time.core :refer (now)]))
+  (:require [korma.core :as k]
+            [clj-time.coerce :refer (to-date)]
+            [clj-time.core :refer (now)]
+            [sdos-site.utils :refer :all]))
 
 (defn base-articles-query
   [db]
@@ -21,15 +22,18 @@
 
 (defn update-article
   [db {:keys [id date title author content category]}]
-  (-> (base-articles-query db)
-      (k/update
-       (k/set-fields
-        {:date date
-         :title title
-         :author author
-         :content content
-         :category category})
-       (k/where {:id id}))))
+  (when id
+    (let [fields (-> {}
+                     (assoc-if date "DATE" date)
+                     (assoc-if title "TITLE" title)
+                     (assoc-if author "AUTHOR" author)
+                     (assoc-if content "CONTENT" content)
+                     (assoc-if category "CATEGORY" category))]
+      (-> (base-articles-query db)
+          (k/update
+           (k/set-fields
+            fields)
+           (k/where {:id id}))))))
 
 (defn find-all-articles
   [db]
