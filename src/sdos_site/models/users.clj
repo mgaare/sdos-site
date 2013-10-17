@@ -84,7 +84,7 @@
   (when-let [id (:id user)]
     (-> (base-users-query db)
         (k/update
-         (k/set-fields {:password (hash-password new-password)})
+         (k/set-fields {"PASSWORD" (hash-password new-password)})
          (k/where {:id id})))))
 
 (defn match-of
