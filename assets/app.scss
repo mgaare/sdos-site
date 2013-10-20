@@ -14,9 +14,12 @@ h3.logo {
   text-align: center;
 }
 
+ul, ol {
+  padding-left: 1.2em;
+}
+
 ul {
   list-style: square;
-  padding-left: 1.2em;
 }
 
 div.content {
