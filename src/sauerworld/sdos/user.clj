@@ -1,10 +1,10 @@
-(ns sdos-site.user
+(ns sauerworld.sdos.user
   (:require [clojure.string :as str]
-            [sdos-site.settings :refer :all]
-            [sdos-site.layout :as layout]
-            [sdos-site.views.user :as view]
-            [sdos-site.models.users :as users]
-            [sdos-site.email :refer (send-email)]
+            [sauerworld.sdos.settings :refer :all]
+            [sauerworld.sdos.layout :as layout]
+            [sauerworld.sdos.views.user :as view]
+            [sauerworld.sdos.models.users :as users]
+            [sauerworld.sdos.email :refer (send-email)]
             [clojure.tools.logging :refer (info)]))
 
 (defn send-validation-email

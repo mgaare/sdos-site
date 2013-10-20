@@ -1,8 +1,8 @@
-(ns sdos-site.models.articles
+(ns sauerworld.sdos.models.articles
   (:require [korma.core :as k]
             [clj-time.coerce :refer (to-date)]
             [clj-time.core :refer (now)]
-            [sdos-site.utils :refer :all]))
+            [sauerworld.sdos.utils :refer :all]))
 
 (defn base-articles-query
   [db]

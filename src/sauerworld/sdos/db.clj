@@ -1,4 +1,4 @@
-(ns sdos-site.db
+(ns sauerworld.sdos.db
   (:require [korma.db :as db]
             [clojure.java.jdbc :as sql]
             [clojure.java.jdbc.ddl :as ddl]
@@ -72,6 +72,7 @@
      [:id "INTEGER PRIMARY KEY AUTO_INCREMENT"]
      [:event "integer"]
      [:user "integer"]
+     [:team "varchar"]
      [:created :timestamp])
     (ddl/create-index :uniquereg :registrations
                       [:event :user] :unique)))

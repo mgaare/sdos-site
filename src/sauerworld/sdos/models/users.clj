@@ -1,4 +1,4 @@
-(ns sdos-site.models.users
+(ns sauerworld.sdos.models.users
   (:require [clojurewerkz.scrypt.core :as sc]
             [korma.core :as k]
             [clj-time.coerce :refer (to-date)]

@@ -1,6 +1,6 @@
-(ns sdos-site.views.user
+(ns sauerworld.sdos.views.user
   (:require [net.cgrand.enlive-html :as html]
-            [sdos-site.layout :as layout]))
+            [sauerworld.sdos.layout :as layout]))
 
 
 (html/defsnippet user-profile "templates/user.html"

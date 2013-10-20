@@ -1,4 +1,4 @@
-(ns sdos-site.layout
+(ns sauerworld.sdos.layout
     (:require [net.cgrand.enlive-html :as html]
               [net.cgrand.reload :refer (auto-reload)]
               [clj-time.format :refer (unparse formatter)]

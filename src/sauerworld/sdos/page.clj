@@ -1,8 +1,8 @@
-(ns sdos-site.page
-  (:require [sdos-site.settings :refer (get-settings)]
-            [sdos-site.models.articles :refer (find-category-articles
+(ns sauerworld.sdos.page
+  (:require [sauerworld.sdos.settings :refer (get-settings)]
+            [sauerworld.sdos.models.articles :refer (find-category-articles
                                                find-article)]
-            [sdos-site.layout :refer (main-template)]))
+            [sauerworld.sdos.layout :refer (main-template)]))
 
 (defn page
   [category]

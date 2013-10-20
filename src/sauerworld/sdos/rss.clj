@@ -1,6 +1,6 @@
-(ns sdos-site.rss
-  (:require [sdos-site.settings :refer (base-url)]
-            [sdos-site.models.articles :refer (find-category-articles)]
+(ns sauerworld.sdos.rss
+  (:require [sauerworld.sdos.settings :refer (base-url)]
+            [sauerworld.sdos.models.articles :refer (find-category-articles)]
             [clj-rss.core :refer (channel-xml)]
             [clj-time.coerce :refer (to-date)]
             [markdown.core :refer (md-to-html-string)]))

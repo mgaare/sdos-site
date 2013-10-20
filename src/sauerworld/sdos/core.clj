@@ -1,10 +1,11 @@
-(ns sdos-site.core
-  (:require [sdos-site.settings :refer :all]
-            [sdos-site.db :refer (create-db)]
-            [sdos-site.page :as page]
-            [sdos-site.user :as user]
-            [sdos-site.admin :as admin]
-            [sdos-site.rss :refer (rss)]
+(ns sauerworld.sdos.core
+  (:require [sauerworld.sdos.settings :refer :all]
+            [sauerworld.sdos.db :refer (create-db)]
+            [sauerworld.sdos.page :as page]
+            [sauerworld.sdos.tournament :as t]
+            [sauerworld.sdos.user :as user]
+            [sauerworld.sdos.admin :as admin]
+            [sauerworld.sdos.rss :refer (rss)]
             [environ.core :refer (env)]
             [compojure.core :refer :all]
             [compojure.route :refer (not-found) :as route]
@@ -13,6 +14,10 @@
             [compojure.handler :refer (site)]))
 
 (def world (atom {}))
+
+(defn test-request
+  [req]
+  (str req))
 
 (defroutes admin-routes
   (GET "/" [] admin/show-articles-summary)
@@ -57,6 +62,8 @@
   (GET "/events" [] (page/page "events"))
   (GET "/article/:id" [] page/show-article)
   (GET "/rss" [] rss)
+  (GET "/tournaments/:id" []  t/show-tournament)
+  (GET "/test" [] test-request)
   (context "/admin" [] (admin/wrap-require-admin admin-routes))
   (context "/user" [] user-routes)
   (not-found "Sorry buddy, page not found!"))

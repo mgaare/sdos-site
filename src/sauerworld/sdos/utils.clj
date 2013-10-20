@@ -1,4 +1,4 @@
-(ns sdos-site.utils)
+(ns sauerworld.sdos.utils)
 
 (defn assoc-if
   [m cond k v]

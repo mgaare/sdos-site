@@ -1,9 +1,9 @@
-(ns sdos-site.admin
-  (:require [sdos-site.settings :refer :all]
-            [sdos-site.models.articles :as articles]
-            [sdos-site.models.users :as users]
-            [sdos-site.views.admin :as view]
-            [sdos-site.layout :as layout]))
+(ns sauerworld.sdos.admin
+  (:require [sauerworld.sdos.settings :refer :all]
+            [sauerworld.sdos.models.articles :as articles]
+            [sauerworld.sdos.models.users :as users]
+            [sauerworld.sdos.views.admin :as view]
+            [sauerworld.sdos.layout :as layout]))
 
 (defn wrap-require-admin
   [h]

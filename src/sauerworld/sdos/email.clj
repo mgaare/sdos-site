@@ -1,4 +1,4 @@
-(ns sdos-site.email
+(ns sauerworld.sdos.email
   (:require [postal.core :refer (send-message)]
             [clojure.tools.logging :refer (error)]))
 

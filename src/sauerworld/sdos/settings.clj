@@ -1,4 +1,4 @@
-(ns sdos-site.settings)
+(ns sauerworld.sdos.settings)
 
 (def redirect-home
   {:status 302

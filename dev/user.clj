@@ -13,9 +13,9 @@
             [environ.core :refer (env)]
             [korma.core :as k]
             [korma.db :as kdb]
-            [sdos-site.core :as core]
-            [sdos-site.db :as db]
-            [sdos-site.layout :as layout]
+            [sauerworld.sdos.core :as core]
+            [sauerworld.sdos.db :as db]
+            [sauerworld.sdos.layout :as layout]
             [clojure.tools.namespace.repl :refer (refresh refresh-all)]
             [net.cgrand.enlive-html :as html]
             [ring.mock.request :as mr]))

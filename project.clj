@@ -1,4 +1,4 @@
-(defproject sdos-site "0.1.0-SNAPSHOT"
+(defproject sauerworld/sdos "0.1.0-SNAPSHOT"
   :description "A website for the Sauerbraten Day of Sobriety"
   :url "dos.sauerworld.org"
   :license {:name "Eclipse Public License"
@@ -23,5 +23,5 @@
                  [com.h2database/h2 "1.3.170"]
                  [clojurewerkz/scrypt "1.0.0"]
                  [com.novemberain/validateur "1.5.0"]]
-  :immutant {:init "sdos-site.core/initialize"
+  :immutant {:init "sauerworld.sdos.core/initialize"
              :context-path "/"})

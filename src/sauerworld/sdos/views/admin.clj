@@ -1,6 +1,6 @@
-(ns sdos-site.views.admin
+(ns sauerworld.sdos.views.admin
   (:require [net.cgrand.enlive-html :as html]
-            [sdos-site.layout :as layout]))
+            [sauerworld.sdos.layout :as layout]))
 
 (html/defsnippet articles-summary "templates/admin.html"
   [:div#admin-articles-summary]

@@ -1,6 +1,6 @@
 (ns immutant.init
   (:require [immutant.util :refer (at-exit)]
-            [sdos-site.core :refer (stop)])
+            [sauerworld.sdos.core :refer (stop)])
   ;(:use sdos-site.core)
 
   ;(:require [immutant.messaging :as messaging]
