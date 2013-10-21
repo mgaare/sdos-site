@@ -73,8 +73,9 @@
   [handler api-queue]
   (fn [req]
     (assoc req :storage-api
-           (fn [msg]
-             (msg/request api-queue msg)))))
+           (fn [action & params]
+             (msg/request api-queue {:action action
+                                     :params params})))))
 
 (defn wrap-smtp-server
   "Adds smtp server params into the request map."

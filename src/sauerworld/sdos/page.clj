@@ -7,8 +7,7 @@
 (defn page
   [category]
   (fn [req]
-    (let [db (:db req)
-          articles (-> ((:storage-api req) find-category-articles category)
+    (let [articles (-> ((:storage-api req) :find-category-articles category)
                        (deref 1000 nil))
           settings (get-settings req)]
       (main-template settings articles))))
@@ -19,7 +18,7 @@
             (get-in req [:route-params :id])
             (Integer/parseInt))]
     (if-let [article (->
-                      ((:storage-api req) find-article db id)
+                      ((:storage-api req) :find-article id)
                       (deref 1000 nil))]
       (let [settings (get-settings req)]
         (main-template settings [article]))
