@@ -57,8 +57,7 @@ To validate your email address, please click on:</p>
 
 (defn profile-page
   [req]
-  (let [db (:db req)
-        user (-> req :session :user)
+  (let [user (-> req :session :user)
         profile-snippet (view/user-profile user)]))
 
 (defn login-page
@@ -70,7 +69,9 @@ To validate your email address, please click on:</p>
   (do
     (let [username (-> req :params :username)
           password (-> req :params :password)]
-      (if-let [user (users/check-login (:db req) username password)]
+      (if-let [user (->
+                     ((:storage-api req) :users/check-login username password)
+                     (deref 1000 nil))]
         (assoc-in redirect-home [:session :user] user)
         (layout/app-page (get-settings req)
                          (view/login-page "Invalid username or password."))))))
@@ -94,17 +95,21 @@ To validate your email address, please click on:</p>
                       :password password
                       :password-confirm password-confirm
                       :email email}
-        db (:db req)
         server (:smtp-server req)
-        validation ((users/make-registration-validator db) registration)]
+        validation (->
+                    ((:storage-api req) :users/make-registration-validator
+                        registration)
+                    (deref 1000 nil))]
     (if-not (empty? validation) ;; escapes first
       (layout/app-page (get-settings req)
                        (view/registration-page (assoc registration
                                                  :error
                                                  (error-strings validation))))
       (do
-        (users/insert-user db registration)
-        (let [newuser (users/get-by-username db username)]
+        ((:storage-api req) :users/insert-user registration)
+        (let [newuser (->
+                       ((:storage-api req) :users/get-by-username username)
+                       (deref 1000 nil))]
           (if (send-validation-email server email (:validation_key newuser))
             (layout/app-page (get-settings req)
                              (view/registration-thanks))
@@ -123,16 +128,19 @@ To validate your email address, please click on:</p>
   [req]
   (let [password (-> req :params :password)
         password-confirm (-> req :params :password-confirm)
-        validation (users/password-validator (:params req))]
+        validation (->
+                    ((:storage-api req) :users/validate-password (:params req))
+                    (deref 1000 true))]
     (if-not (nil? validation)
       ;; validation error case
       (layout/app-page (get-settings req)
                        (view/password-page
                         {:error (error-strings validation)}))
       ;; validation ok case
-      (let [db (:db req)
-            user (-> req :session :user)]
-        (if (users/update-password db user password)
+      (let [user (-> req :session :user)]
+        (if (->
+             ((:storage-api req) :users/update-password user password)
+             (deref 1000 nil))
           (layout/app-page (get-settings req)
                            (view/success-page))
           (let [error-msg
@@ -167,10 +175,13 @@ To validate your email address, please click on:</p>
 
 (defn validate-email
   [req]
-  (let [submitted-key (-> req :request-params :validation-key)
-        db (:db req)]
-    (if-let [user (users/get-by-validation-key db submitted-key)]
-      (if (users/set-validated db user)
+  (let [submitted-key (-> req :request-params :validation-key)]
+    (if-let [user (->
+                   ((:storage-api req) :users/get-by-validation-key submitted-key)
+                   (deref 1000 nil))]
+      (if (->
+           ((:storage-api req) :users/set-validated user)
+           (deref 1000 nil))
         (let [session-user (-> req :session :user)
               body (view/success-page (str "Email validated."))]
           (if (= (:id user) (:id session-user))

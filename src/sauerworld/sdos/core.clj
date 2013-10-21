@@ -11,6 +11,7 @@
             [compojure.route :refer (not-found) :as route]
             [immutant.web :refer (wrap-resource) :as web]
             [immutant.util :refer (at-exit)]
+            [immutant.messaging :as msg]
             [compojure.handler :refer (site)]))
 
 (def world (atom {}))
@@ -68,23 +69,12 @@
   (context "/user" [] user-routes)
   (not-found "Sorry buddy, page not found!"))
 
-(defn wrap-db
-  "Adds a db connection reference to the request map."
-  [handler db-con]
+(defn wrap-storage-api
+  [handler api-queue]
   (fn [req]
-    (-> req
-        (assoc :db db-con)
-        handler)))
-
-(defn wrap-db-missing
-  "Error handler for when the db connection reference is missing."
-  [handler]
-  (fn [req]
-    (if (:db req)
-      (handler req)
-      {:status 500
-       :headers {}
-       :body "Unrecoverable Database error. Specifically, the database is missing."})))
+    (assoc req :storage-api
+           (fn [msg]
+             (msg/request api-queue msg)))))
 
 (defn wrap-smtp-server
   "Adds smtp server params into the request map."
@@ -96,17 +86,13 @@
 
 (def app (-> app-routes
              site
-             wrap-db-missing
              (wrap-resource "public")))
 
 (defn stop []
-  (when-let [db (@world :db)]
-    (let [datasource (-> db :pool deref :datasource)]
-      (.close datasource))))
+  nil)
 
 (defn start []
-  (let [db (create-db "resources/db/main")
-        smtp-host (:mg-smtp-host env)
+  (let [smtp-host (:mg-smtp-host env)
         smtp-login (:mg-smtp-login env)
         smtp-password (:mg-smtp-password env)
         smtp-params {:host smtp-host
@@ -117,14 +103,16 @@
         smtp-wrap-fn (if (and smtp-host smtp-login smtp-password)
                        (fn [h]
                          (wrap-smtp-server h smtp-params))
-                       identity)]
+                       identity)
+        api-queue-name "queue/storage"
+        api-handle (msg/start api-queue-name)
+        ]
     (do
       (-> app
-          (wrap-db db)
+          (wrap-storage-api api-queue-name)
           smtp-wrap-fn
           web/start)
-      (swap! world assoc :db db))))
+      (swap! world assoc :api-handle api-handle))))
 
 (defn initialize []
-  (start)
-  (at-exit stop))
+  (start))

@@ -8,7 +8,8 @@
   [category]
   (fn [req]
     (let [db (:db req)
-          articles (find-category-articles db category)
+          articles (-> ((:storage-api req) find-category-articles category)
+                       (deref 1000 nil))
           settings (get-settings req)]
       (main-template settings articles))))
 
@@ -16,9 +17,10 @@
   [req]
   (let [id (some->
             (get-in req [:route-params :id])
-            (Integer/parseInt))
-        db (:db req)]
-    (if-let [article (find-article db id)]
+            (Integer/parseInt))]
+    (if-let [article (->
+                      ((:storage-api req) find-article db id)
+                      (deref 1000 nil))]
       (let [settings (get-settings req)]
         (main-template settings [article]))
       {:status 404 :headers {} :body "Sorry, article not found."})))
